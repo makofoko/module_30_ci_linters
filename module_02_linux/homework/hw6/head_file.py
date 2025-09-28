@@ -29,4 +29,3 @@ def head_file(size: int, relative_path: str) -> str:
 
 if __name__ == "__main__":
     app.run(debug=True)
-
