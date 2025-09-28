@@ -1,37 +1,46 @@
-"""
-Реализуйте приложение для учёта финансов, умеющее запоминать, сколько денег было потрачено за день,
-а также показывать затраты за отдельный месяц и за целый год.
-
-В программе должно быть три endpoints:
-
-/add/<date>/<int:number> — сохранение информации о совершённой в рублях трате за какой-то день;
-/calculate/<int:year> — получение суммарных трат за указанный год;
-/calculate/<int:year>/<int:month> — получение суммарных трат за указанные год и месяц.
-
-Дата для /add/ передаётся в формате YYYYMMDD, где YYYY — год, MM — месяц (от 1 до 12), DD — число (от 01 до 31).
-Гарантируется, что переданная дата имеет такой формат и она корректна (никаких 31 февраля).
-"""
-
 from flask import Flask
 
 app = Flask(__name__)
 
-storage = {}
+storage: dict[int, dict] = {}
 
 
 @app.route("/add/<date>/<int:number>")
-def add(date: str, number: int):
-    ...
+def add_expense(date: str, number: int) -> str:
+    """
+    Добавляет трату за конкретный день.
+    Формат даты: YYYYMMDD
+    """
+    year = int(date[:4])
+    month = int(date[4:6])
+
+    storage.setdefault(year, {}).setdefault("total", 0)
+    storage[year].setdefault(month, 0)
+
+    storage[year]["total"] += number
+    storage[year][month] += number
+
+    return f"Добавлена трата {number} руб. за {date}"
 
 
 @app.route("/calculate/<int:year>")
-def calculate_year(year: int):
-    ...
+def calculate_year(year: int) -> str:
+    """
+    Возвращает суммарные траты за указанный год.
+    """
+    if year not in storage:
+        return f"За {year} год трат не найдено."
+    return f"Суммарные траты за {year} год: {storage[year]['total']} руб."
 
 
-@app.route("/calculate/<int:year>/<int:month>")
-def calculate_month(year: int, month: int):
-    ...
+@app.route("/calculate/<int:year><int:month>")
+def calculate_month(year: int, month: int) -> str:
+    """
+    Возвращает суммарные траты за указанный год и месяц.
+    """
+    if year not in storage or month not in storage[year]:
+        return f"За {month:02d}.{year} трат не найдено."
+    return f"Суммарные траты за {month:02d}.{year}: {storage[year][month]} руб."
 
 
 if __name__ == "__main__":
