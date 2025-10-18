@@ -1,6 +1,5 @@
 import sys
 
-
 def decrypt(encryption: str) -> str:
     result: list = []
     dots: int = 0
@@ -16,7 +15,6 @@ def decrypt(encryption: str) -> str:
             dots = 0
 
     return ''.join(result)
-
 
 if __name__ == '__main__':
     data: str = sys.stdin.read()
