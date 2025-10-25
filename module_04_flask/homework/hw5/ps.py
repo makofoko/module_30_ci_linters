@@ -1,21 +1,30 @@
-"""
-Напишите GET-эндпоинт /ps, который принимает на вход аргументы командной строки,
-а возвращает результат работы команды ps с этими аргументами.
-Входные значения эндпоинт должен принимать в виде списка через аргумент arg.
-
-Например, для исполнения команды ps aux запрос будет следующим:
-
-/ps?arg=a&arg=u&arg=x
-"""
-
-from flask import Flask
+import shlex
+import subprocess
+from flask import Flask, request
 
 app = Flask(__name__)
 
 
 @app.route("/ps", methods=["GET"])
-def ps() -> str:
-    ...
+def ps_command():
+    args = request.args.getlist("arg")
+
+    safe_args = [shlex.quote(arg) for arg in args]
+
+    command = ["ps"] + safe_args
+
+    try:
+        result = subprocess.run(
+            command,
+            capture_output=True,
+            text=True,
+            check=True
+        )
+        output = result.stdout
+    except subprocess.CalledProcessError as e:
+        return f"<pre>Error executing ps: {e}</pre>", 500
+
+    return f"<pre>{output}</pre>"
 
 
 if __name__ == "__main__":
