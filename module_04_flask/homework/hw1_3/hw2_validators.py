@@ -1,4 +1,6 @@
 from wtforms.validators import ValidationError
+from wtforms import Field
+from flask_wtf import FlaskForm
 
 class NumberLength:
     """
@@ -11,20 +13,14 @@ class NumberLength:
             message = f"Длина числа должна быть от {min} до {max} символов"
         self.message = message
 
-    def __call__(self, form, field):
+    def __call__(self, form: FlaskForm, field: Field):
         data = str(field.data) if field.data is not None else ""
         if not data.isdigit():
             raise ValidationError("Значение должно содержать только цифры")
         if not (self.min <= len(data) <= self.max):
             raise ValidationError(self.message)
 
+    from wtforms import StringField, Form
 
-from wtforms import StringField, Form
-
-
-class MyForm(Form):
-    # функциональный валидатор
-    phone1 = StringField("Телефон (функция)", validators=[number_length(10, 10)])
-
-    # класс-валидатор
-    phone2 = StringField("Телефон (класс)", validators=[NumberLength(10, 10)])
+    class MyForm(Form):
+        phone = StringField("Телефон", validators=[NumberLength(10, 10)])
