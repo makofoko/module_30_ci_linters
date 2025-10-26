@@ -1,19 +1,30 @@
 from wtforms.validators import ValidationError
 
-def number_length(min: int, max: int, message: Optional[str] = None):
+class NumberLength:
     """
-    Валидатор для проверки длины числа (как строки).
+    Класс-валидатор для проверки длины числа (как строки).
     """
-    if message is None:
-        message = f"Длина числа должна быть от {min} до {max} символов"
+    def __init__(self, min: int, max: int, message: str = None):
+        self.min = min
+        self.max = max
+        if message is None:
+            message = f"Длина числа должна быть от {min} до {max} символов"
+        self.message = message
 
-    def _number_length(form, field: Field):
+    def __call__(self, form, field):
         data = str(field.data) if field.data is not None else ""
         if not data.isdigit():
             raise ValidationError("Значение должно содержать только цифры")
-        if not (min <= len(data) <= max):
-            raise ValidationError(message)
+        if not (self.min <= len(data) <= self.max):
+            raise ValidationError(self.message)
 
-    return _number_length
 
-phone = StringField("Телефон", validators=[number_length(10, 10)])
+from wtforms import StringField, Form
+
+
+class MyForm(Form):
+    # функциональный валидатор
+    phone1 = StringField("Телефон (функция)", validators=[number_length(10, 10)])
+
+    # класс-валидатор
+    phone2 = StringField("Телефон (класс)", validators=[NumberLength(10, 10)])
