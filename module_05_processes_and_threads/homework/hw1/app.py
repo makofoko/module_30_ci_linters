@@ -1,17 +1,7 @@
-"""
-Консольная утилита lsof (List Open Files) выводит информацию о том, какие файлы используют какие-либо процессы.
-Эта команда может рассказать много интересного, так как в Unix-подобных системах всё является файлом.
-
-Но нам пока нужна лишь одна из её возможностей.
-Запуск lsof -i :port выдаст список процессов, занимающих введённый порт.
-Например, lsof -i :5000.
-
-Как мы с вами выяснили, наш сервер отказывается запускаться, если кто-то занял его порт. Напишите функцию,
-которая на вход принимает порт и запускает по нему сервер. Если порт будет занят,
-она должна найти процесс по этому порту, завершить его и попытаться запустить сервер ещё раз.
-"""
+import subprocess
+import os
+import signal
 from typing import List
-
 from flask import Flask
 
 app = Flask(__name__)
@@ -24,11 +14,16 @@ def get_pids(port: int) -> List[int]:
     @return: список PID процессов, занимающих порт
     """
     if not isinstance(port, int):
-        raise ValueError
+        raise ValueError("Порт должен быть числом")
 
-    pids: List[int] = []
-    ...
-    return pids
+    try:
+        result = subprocess.check_output(
+            ["lsof", "-t", f"-i:{port}"], text=True
+        )
+        pids = [int(pid) for pid in result.strip().split("\n") if pid]
+        return pids
+    except subprocess.CalledProcessError:
+        return []
 
 
 def free_port(port: int) -> None:
@@ -37,7 +32,14 @@ def free_port(port: int) -> None:
     @param port: порт
     """
     pids: List[int] = get_pids(port)
-    ...
+    for pid in pids:
+        try:
+            os.kill(pid, signal.SIGTERM)
+            print(f"Процесс {pid} завершён (порт {port})")
+        except ProcessLookupError:
+            print(f"Процесс {pid} уже не существует")
+        except PermissionError:
+            print(f"Нет прав для завершения процесса {pid}")
 
 
 def run(port: int) -> None:
