@@ -1,4 +1,5 @@
 import sys
+import traceback
 from types import TracebackType
 from typing import Type, Literal, IO
 
@@ -25,8 +26,13 @@ class Redirect:
         exc_val: BaseException | None,
         exc_tb: TracebackType | None
     ) -> Literal[True] | None:
+        if exc_type is not None and self._new_stderr is not None:
+            self._new_stderr.write("".join(traceback.format_exception(exc_type, exc_val, exc_tb)))
+            self._new_stderr.flush()
+
         if self._old_stdout is not None:
             sys.stdout = self._old_stdout
         if self._old_stderr is not None:
             sys.stderr = self._old_stderr
+
         return None
