@@ -1,42 +1,54 @@
-"""
-Удобно сохранять логи в определённом формате, чтобы затем их можно было фильтровать и анализировать. 
-Сконфигурируйте логгер так, чтобы он писал логи в файл skillbox_json_messages.log в следующем формате:
-
-{"time": "<время>", "level": "<уровень лога>", "message": "<сообщение>"}
-
-Но есть проблема: если в message передать двойную кавычку, то лог перестанет быть валидной JSON-строкой:
-
-{"time": "21:54:15", "level": "INFO", "message": "“"}
-
-Чтобы этого избежать, потребуется LoggerAdapter. Это класс из модуля logging,
-который позволяет модифицировать логи перед тем, как они выводятся.
-У него есть единственный метод — process, который изменяет сообщение или именованные аргументы, переданные на вход.
-
-class JsonAdapter(logging.LoggerAdapter):
-  def process(self, msg, kwargs):
-    # меняем msg
-    return msg, kwargs
-
-Использовать можно так:
-
-logger = JsonAdapter(logging.getLogger(__name__))
-logger.info('Сообщение')
-
-Вам нужно дописать метод process так, чтобы в логах была всегда JSON-валидная строка.
-"""
-
 import logging
+import sys
 
 
 class JsonAdapter(logging.LoggerAdapter):
+    """
+    Этот адаптер принимает сообщение (msg) и экранирует
+    все символы, которые могут сломать JSON-строку:
+    - Заменяет \ на \\
+    - Заменяет " на \"
+    """
+
     def process(self, msg, kwargs):
-        new_message = msg
-        return new_message, kwargs
+        msg_str = str(msg)
+
+        msg_str = msg_str.replace('\\', '\\\\')
+        msg_str = msg_str.replace('"', '\\"')
+
+        return msg_str, kwargs
+
+
+def setup_logging():
+    """Настраивает логгер."""
+
+    base_logger = logging.getLogger(__name__)
+    base_logger.setLevel(logging.DEBUG)
+
+    file_handler = logging.FileHandler('skillbox_json_messages.log', mode='w')
+
+    # адаптером сообщение.
+    formatter = logging.Formatter(
+        '{"time": "%(asctime)s", "level": "%(levelname)s", "message": "%(message)s"}',
+        datefmt='%H:%M:%S'
+    )
+
+    file_handler.setFormatter(formatter)
+
+    if base_logger.hasHandlers():
+        base_logger.handlers.clear()
+    base_logger.addHandler(file_handler)
+
+    return base_logger
 
 
 if __name__ == '__main__':
-    logger = JsonAdapter(logging.getLogger(__name__))
-    logger.setLevel(logging.DEBUG)
-    logger.info('Сообщение')
-    logger.error('Кавычка)"')
-    logger.debug("Еще одно сообщение")
+    configured_logger = setup_logging()
+
+    logger = JsonAdapter(configured_logger)
+
+    # Тестируем
+    logger.info('Простое сообщение.')
+    logger.error('Сообщение с "двойной кавычкой".')
+    logger.debug('Сообщение с C:\\Windows\\Path')
+    logger.warning('Сообщение с "несколькими" \ "кавычками" и \ слешами.')

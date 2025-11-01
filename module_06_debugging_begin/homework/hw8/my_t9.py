@@ -1,30 +1,81 @@
-"""
-У нас есть кнопочный телефон (например, знаменитая Nokia 3310), и мы хотим,
-чтобы пользователь мог проще отправлять СМС. Реализуем своего собственного клавиатурного помощника.
+import sys
+from typing import List, Dict
+from collections import defaultdict
 
-Каждой цифре телефона соответствует набор букв:
-* 2 — a, b, c;
-* 3 — d, e, f;
-* 4 — g, h, i;
-* 5 — j, k, l;
-* 6 — m, n, o;
-* 7 — p, q, r, s;
-* 8 — t, u, v;
-* 9 — w, x, y, z.
+T9_MAP = {
+    '2': 'abc',
+    '3': 'def',
+    '4': 'ghi',
+    '5': 'jkl',
+    '6': 'mno',
+    '7': 'pqrs',
+    '8': 'tuv',
+    '9': 'wxyz'
+}
 
-Пользователь нажимает на клавиши, например 22736368, после чего на экране печатается basement.
+WORDS_FILE = "words_alpha.txt"
 
-Напишите функцию my_t9, которая принимает на вход строку, состоящую из цифр 2–9,
-и возвращает список слов английского языка, которые можно получить из этой последовательности цифр.
-"""
-from typing import List
+REVERSE_T9_MAP: Dict[str, str] = {}
+for digit, letters in T9_MAP.items():
+    for letter in letters:
+        REVERSE_T9_MAP[letter] = digit
+
+def load_word_list() -> Dict[str, List[str]]:
+    """
+    Читает файл WORDS_FILE и создает карту:
+    { "цифровая_последовательность": ["список", "слов"] }
+    """
+    processed_map = defaultdict(list)
+
+    try:
+        with open(WORDS_FILE, 'r', encoding='utf-8') as f:
+            for line in f:
+                word = line.strip().lower()
+
+                if not word.isalpha():
+                    continue
+
+                t9_sequence = []
+                for char in word:
+                    digit = REVERSE_T9_MAP.get(char)
+                    if digit:
+                        t9_sequence.append(digit)
+                    else:
+                        t9_sequence = [] # Очищаем
+                        break
+
+                if t9_sequence:
+                    key = "".join(t9_sequence)
+                    processed_map[key].append(word)
+
+    except FileNotFoundError:
+        print(f"ОШИБКА: Файл словаря '{WORDS_FILE}' не найден!", file=sys.stderr)
+        print("Пожалуйста, создайте этот файл.", file=sys.stderr)
+
+    return processed_map
+
+print(f"Загрузка словаря из {WORDS_FILE}...")
+T9_WORD_MAP = load_word_list()
+print(f"Словарь загружен. Найдено {len(T9_WORD_MAP)} уникальных T9-последовательностей.")
+
 
 
 def my_t9(input_numbers: str) -> List[str]:
-    ...
+    """
+    Находит все английские слова,
+    соответствующие T9-последовательности,
+    используя заранее обработанную карту T9_WORD_MAP.
+    """
+    return T9_WORD_MAP.get(input_numbers, [])
 
 
 if __name__ == '__main__':
+    print("\nВведите T9-последовательность (например, 22736368):")
     numbers: str = input()
     words: List[str] = my_t9(numbers)
-    print(*words, sep='\n')
+
+    if words:
+        print("\nНайденные слова:")
+        print(*words, sep='\n')
+    else:
+        print(f"\nСлов для последовательности '{numbers}' не найдено.")
