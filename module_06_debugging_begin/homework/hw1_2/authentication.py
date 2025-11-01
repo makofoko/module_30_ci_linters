@@ -2,6 +2,10 @@ import getpass
 import hashlib
 import logging
 import sys
+import re
+
+with open("words", "r", encoding="utf-8") as f:
+    WORDS_SET = {line.strip().lower() for line in f if line.strip()}
 
 WEAK_WORDS_LIST = [
     "password", "admin", "root", "test", "login", "user", 
@@ -13,15 +17,15 @@ logger = logging.getLogger("password_checker")
 
 def is_strong_password(password: str) -> bool:
     """
-    ЗАДАЧА 2: Проверяет, что пароль НЕ содержит 
-    английских слов из списка WEAK_WORDS_LIST.
+    Проверяет, что пароль НЕ содержит английских слов из словаря words.
     """
     password_lower = password.lower()
-    
-    for word in WEAK_WORDS_LIST:
-        if word in password_lower:
-            logger.warning(f"Пароль содержит недопустимое слово: '{word}'")
 
+    words_in_password: list[str] = re.findall(r"[a-z]+", password_lower, flags=re.IGNORECASE)
+
+    for word in words_in_password:
+        if word in WORDS_SET:
+            logger.warning(f"Пароль содержит недопустимое слово: '{word}'")
             return False
     return True
 

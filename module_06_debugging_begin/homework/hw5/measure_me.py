@@ -3,6 +3,13 @@ import time
 import random
 from typing import List
 
+logging.basicConfig(
+    level=logging.DEBUG,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+    filename="measure_log.txt",
+    filemode="w"
+)
+
 logger = logging.getLogger(__name__)
 logging.basicConfig(
     level=logging.DEBUG,
@@ -39,6 +46,24 @@ def measure_me(nums: List[int]) -> List[List[int]]:
     elapsed = time.perf_counter() - start
     logger.debug(f"Leave measure_me, took {elapsed:.6f} seconds")
     return results
+
+def average_from_logs(path: str) -> float:
+    durations = []
+    with open(path, "r", encoding="utf-8") as f:
+        for line in f:
+            if "Leave measure_me, took" in line:
+                try:
+                    duration = float(line.strip().split("took")[1].split()[0])
+                    durations.append(duration)
+                except (IndexError, ValueError):
+                    continue
+    return sum(durations) / len(durations) if durations else 0.0
+
+
+if __name__ == "__main__":
+    avg = average_from_logs("measure_log.txt")
+    print(f"Среднее время выполнения measure_me (из логов): {avg:.6f} сек")
+
 
 if __name__ == "__main__":
     durations = []
