@@ -1,6 +1,6 @@
-import sys
 import logging
 from utils import string_to_operator
+from logging_config import setup_logging
 
 logger = logging.getLogger(__name__)
 
@@ -30,11 +30,6 @@ def calc(args):
     logger.debug("%s %s %s = %s", num_1, operator, num_2, result)
 
 
-if __name__ == '__main__':
-    logging.basicConfig(
-        level=logging.DEBUG,
-        format="%(levelname)s | %(name)s | %(asctime)s | line:%(lineno)d | %(message)s",
-        datefmt="%Y-%m-%d %H:%M:%S",
-        stream=sys.stdout
-    )
+if __name__ == "__main__":
+    setup_logging()
     calc(['2', '+', '3'])
