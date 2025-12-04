@@ -21,10 +21,9 @@ class Philosopher(threading.Thread):
             time.sleep(random.randint(1, 10))
             logger.info(f'Philosopher {self.name} is hungry.')
 
-            # Используем контекстный менеджер вместо acquire/release
             with self.left_fork:
                 logger.info(f'Philosopher {self.name} acquired left fork')
-                # Проверяем, свободна ли правая вилка
+                
                 if self.right_fork.locked():
                     continue
                 with self.right_fork:
