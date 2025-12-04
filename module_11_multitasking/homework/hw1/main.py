@@ -7,7 +7,6 @@ from typing import List
 logging.basicConfig(level='INFO')
 logger: logging.Logger = logging.getLogger(__name__)
 
-
 class Philosopher(threading.Thread):
     running: bool = True
 
@@ -21,25 +20,21 @@ class Philosopher(threading.Thread):
             logger.info(f'Philosopher {self.name} start thinking.')
             time.sleep(random.randint(1, 10))
             logger.info(f'Philosopher {self.name} is hungry.')
-            try:
-                self.left_fork.acquire()
+
+            # Используем контекстный менеджер вместо acquire/release
+            with self.left_fork:
                 logger.info(f'Philosopher {self.name} acquired left fork')
+                # Проверяем, свободна ли правая вилка
                 if self.right_fork.locked():
                     continue
-                try:
-                    self.right_fork.acquire()
+                with self.right_fork:
                     logger.info(f'Philosopher {self.name} acquired right fork')
                     self.dining()
-                finally:
-                    self.right_fork.release()
-            finally:
-                self.left_fork.release()
 
     def dining(self) -> None:
         logger.info(f'Philosopher {self.name} starts eating.')
         time.sleep(random.randint(1, 10))
         logger.info(f'Philosopher {self.name} finishes eating and leaves to think.')
-
 
 def main() -> None:
     forks: List[threading.Lock] = [threading.Lock() for n in range(5)]
@@ -53,7 +48,6 @@ def main() -> None:
     time.sleep(200)
     Philosopher.running = False
     logger.info("Now we're finishing.")
-
 
 if __name__ == "__main__":
     main()
