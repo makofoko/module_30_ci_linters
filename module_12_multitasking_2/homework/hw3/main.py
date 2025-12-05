@@ -1,8 +1,8 @@
 from threading import Semaphore, Thread
 import time
+import sys
 
 sem: Semaphore = Semaphore()
-
 
 def fun1():
     while True:
@@ -11,7 +11,6 @@ def fun1():
         sem.release()
         time.sleep(0.25)
 
-
 def fun2():
     while True:
         sem.acquire()
@@ -19,12 +18,14 @@ def fun2():
         sem.release()
         time.sleep(0.25)
 
+t1: Thread = Thread(target=fun1, daemon=True)
+t2: Thread = Thread(target=fun2, daemon=True)
 
-t1: Thread = Thread(target=fun1)
-t2: Thread = Thread(target=fun2)
 try:
     t1.start()
     t2.start()
+    while True:
+        time.sleep(0.1)
 except KeyboardInterrupt:
     print('\nReceived keyboard interrupt, quitting threads.')
-    exit(1)
+    sys.exit(0)
