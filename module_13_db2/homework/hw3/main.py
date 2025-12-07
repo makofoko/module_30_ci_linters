@@ -22,13 +22,14 @@ def check_if_such_bird_already_seen(
 ) -> bool:
     """
     Проверяет, наблюдалась ли такая птица ранее.
-    Использует выборку с условием и не получает все записи.
+    Возвращает True, если птица встречалась больше одного раза.
     """
     cursor.execute(
-        "SELECT 1 FROM table_birds WHERE bird_name = ? LIMIT 1;",
+        "SELECT COUNT(*) FROM table_birds WHERE bird_name = ?;",
         (bird_name,)
     )
-    return cursor.fetchone() is not None
+    count = cursor.fetchone()[0]
+    return count > 1
 
 
 if __name__ == "__main__":
@@ -44,4 +45,6 @@ if __name__ == "__main__":
 
         if check_if_such_bird_already_seen(cursor, name):
             print("Такую птицу мы уже наблюдали!")
+        else:
+            print("Эта птица встречается впервые!")
         connection.commit()

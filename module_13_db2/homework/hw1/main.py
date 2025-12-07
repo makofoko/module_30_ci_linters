@@ -11,10 +11,10 @@ def check_if_vaccine_has_spoiled(
     """
 
     cursor.execute("""
-        SELECT temperature
+        SELECT COUNT(*)
         FROM table_truck_with_vaccine
         WHERE truck_number = ?
-        ORDER BY timestamp ASC;
+        AND (temperature_in_celsius NOT BETWEEN 16 AND 20)
     """, (truck_number,))
     temps = [row[0] for row in cursor.fetchall()]
 
