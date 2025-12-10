@@ -1,0 +1,175 @@
+{
+  "info": {
+    "_postman_id": "7f6824ea-edd3-4e04-a727-c710362f45ff",
+    "name": "hotel-api-v1",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "7215458"
+  },
+  "item": [
+    {
+      "name": "Create Room",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"floor\": 1,\n  \"beds\": 1,\n  \"guestNum\": 2,\n  \"price\": 1000\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{url}}/api/v1/rooms",
+          "host": ["{{url}}"],
+          "path": ["api", "v1", "rooms"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"201 Created\", () => pm.response.to.have.status(201));",
+              "const body = pm.response.json();",
+              "pm.test(\"Has roomId\", () => pm.expect(body).to.have.property(\"roomId\"));",
+              "pm.environment.set(\"roomId\", body.roomId);"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "List Rooms",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Content-Type", "value": "application/json", "type": "text" }
+        ],
+        "url": {
+          "raw": "{{url}}/api/v1/rooms",
+          "host": ["{{url}}"],
+          "path": ["api", "v1", "rooms"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"200 OK\", () => pm.response.to.have.status(200));",
+              "const body = pm.response.json();",
+              "pm.test(\"Rooms is array\", () => pm.expect(Array.isArray(body.rooms)).to.be.true);"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Filter Available Rooms",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Content-Type", "value": "application/json", "type": "text" }
+        ],
+        "url": {
+          "raw": "{{url}}/api/v1/rooms?checkIn={{checkInDate}}&checkOut={{checkOutDate}}&guestsNum=2",
+          "host": ["{{url}}"],
+          "path": ["api", "v1", "rooms"],
+          "query": [
+            { "key": "checkIn", "value": "{{checkInDate}}" },
+            { "key": "checkOut", "value": "{{checkOutDate}}" },
+            { "key": "guestsNum", "value": "2" }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"200 OK\", () => pm.response.to.have.status(200));",
+              "const body = pm.response.json();",
+              "pm.test(\"Rooms available for dates\", () => pm.expect(Array.isArray(body.rooms)).to.be.true);"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Create Booking",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json", "type": "text" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"roomId\": {{roomId}},\n  \"firstName\": \"John\",\n  \"lastName\": \"Smith\",\n  \"bookingDates\": { \"checkIn\": \"{{checkInDate}}\", \"checkOut\": \"{{checkOutDate}}\" }\n}"
+        },
+        "url": {
+          "raw": "{{url}}/api/v1/bookings",
+          "host": ["{{url}}"],
+          "path": ["api", "v1", "bookings"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"201 Created\", () => pm.response.to.have.status(201));",
+              "const body = pm.response.json();",
+              "pm.test(\"Has bookingId\", () => pm.expect(body).to.have.property(\"bookingId\"));",
+              "pm.environment.set(\"bookingId\", body.bookingId);"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Double Booking Conflict",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json", "type": "text" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"roomId\": {{roomId}},\n  \"firstName\": \"John\",\n  \"lastName\": \"Smith\",\n  \"bookingDates\": { \"checkIn\": \"{{checkInDate}}\", \"checkOut\": \"{{checkOutDate}}\" }\n}"
+        },
+        "url": {
+          "raw": "{{url}}/api/v1/bookings",
+          "host": ["{{url}}"],
+          "path": ["api", "v1", "bookings"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"409 Conflict\", () => pm.response.to.have.status(409));",
+              "const body = pm.response.json();",
+              "pm.test(\"Error payload\", () => {",
+              "  pm.expect(body).to.have.property(\"error\");",
+              "  pm.expect(body.error).to.have.property(\"code\", \"ROOM_CONFLICT\");",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    { "key": "url", "value": "http://localhost:5000" },
+    { "key": "checkInDate", "value": "20210308" },
+    { "key": "checkOutDate", "value": "20210311" }
+  ]
+}
