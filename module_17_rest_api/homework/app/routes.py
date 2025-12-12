@@ -1,38 +1,58 @@
-from flask import Flask, request
-from flask_restful import Api, Resource
-from marshmallow import ValidationError
+from flask_restx import Api, Resource, Namespace
+from flask import request
+from models import db, Book, Author
+from schemas import BookSchema, AuthorSchema
 
-from models import (
-    DATA,
-    get_all_books,
-    init_db,
-    add_book,
-)
-from schemas import BookSchema
+api = Api()
+book_ns = Namespace("books")
+author_ns = Namespace("authors")
 
-app = Flask(__name__)
-api = Api(app)
+book_schema = BookSchema()
+author_schema = AuthorSchema()
 
+@book_ns.route("/<int:id>")
+class BookResource(Resource):
+    def get(self, id):
+        book = Book.query.get_or_404(id)
+        return book_schema.dump(book)
 
-class BookList(Resource):
-    def get(self) -> tuple[list[dict], int]:
-        schema = BookSchema()
-        return schema.dump(get_all_books(), many=True), 200
-
-    def post(self) -> tuple[dict, int]:
+    def put(self, id):
+        book = Book.query.get_or_404(id)
         data = request.json
-        schema = BookSchema()
-        try:
-            book = schema.load(data)
-        except ValidationError as exc:
-            return exc.messages, 400
+        author = Author.query.get(data["author_id"])
+        if not author:
+            return {"error": "Author not found"}, 404
+        book.title = data["title"]
+        book.author_id = data["author_id"]
+        db.session.commit()
+        return {"message": "Book updated"}, 200
 
-        book = add_book(book)
-        return schema.dump(book), 201
+    def delete(self, id):
+        book = Book.query.get_or_404(id)
+        db.session.delete(book)
+        db.session.commit()
+        return {"message": "Book deleted"}, 200
 
+@author_ns.route("/")
+class AuthorList(Resource):
+    def post(self):
+        data = request.json
+        author = Author(**data)
+        db.session.add(author)
+        db.session.commit()
+        return author_schema.dump(author), 201
 
-api.add_resource(BookList, '/api/books')
+@author_ns.route("/<int:id>")
+class AuthorResource(Resource):
+    def get(self, id):
+        author = Author.query.get_or_404(id)
+        return {
+            "author": author_schema.dump(author),
+            "books": [book_schema.dump(b) for b in author.books]
+        }
 
-if __name__ == '__main__':
-    init_db(initial_records=DATA)
-    app.run(debug=True)
+    def delete(self, id):
+        author = Author.query.get_or_404(id)
+        db.session.delete(author)
+        db.session.commit()
+        return {"message": "Author and all books deleted"}, 200
