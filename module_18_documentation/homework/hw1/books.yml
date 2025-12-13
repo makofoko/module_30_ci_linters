@@ -1,0 +1,66 @@
+openapi: 3.0.0
+info:
+  title: Books API
+  version: "1.0"
+paths:
+  /api/books/{id}:
+    get:
+      summary: Получить книгу по ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Book'
+        "404":
+          description: Книга не найдена
+    put:
+      summary: Обновить книгу по ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Book'
+      responses:
+        "200":
+          description: Книга обновлена
+        "404":
+          description: Автор не найден
+    delete:
+      summary: Удалить книгу по ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Книга удалена
+        "404":
+          description: Книга не найдена
+components:
+  schemas:
+    Book:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        author_id:
+          type: integer

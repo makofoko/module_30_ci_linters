@@ -1,0 +1,25 @@
+{
+  "methods": {
+    "calc.add": {
+      "params": { "a": "float", "b": "float" },
+      "result": "float",
+      "description": "Сложение двух чисел"
+    },
+    "calc.sub": {
+      "params": { "a": "float", "b": "float" },
+      "result": "float",
+      "description": "Вычитание двух чисел"
+    },
+    "calc.mul": {
+      "params": { "a": "float", "b": "float" },
+      "result": "float",
+      "description": "Умножение двух чисел"
+    },
+    "calc.div": {
+      "params": { "a": "float", "b": "float" },
+      "result": "float",
+      "description": "Деление двух чисел",
+      "errors": ["Division by zero"]
+    }
+  }
+}

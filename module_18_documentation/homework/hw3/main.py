@@ -1,41 +1,32 @@
+from flask import Flask, request, jsonify
 import operator
-from flask import Flask
-from flask_jsonrpc import JSONRPC
 
 app = Flask(__name__)
-jsonrpc = JSONRPC(app, '/api', enable_web_browsable_api=True)
 
+@app.route("/api", methods=["POST"])
+def rpc():
+    data = request.get_json()
+    method = data.get("method")
+    params = data.get("params", {})
+    a, b = params.get("a"), params.get("b")
 
-@jsonrpc.method('calc.add')
-def add(a: float, b: float) -> float:
-    """
-    Пример запроса:
+    try:
+        if method == "calc.add":
+            result = operator.add(a, b)
+        elif method == "calc.sub":
+            result = operator.sub(a, b)
+        elif method == "calc.mul":
+            result = operator.mul(a, b)
+        elif method == "calc.div":
+            if b == 0:
+                raise ZeroDivisionError("Division by zero")
+            result = operator.truediv(a, b)
+        else:
+            return jsonify({"error": "Unknown method"}), 400
 
-    $ curl -i -X POST -H "Content-Type: application/json; indent=4" \
-        -d '{
-            "jsonrpc": "2.0",
-            "method": "calc.add",
-            "params": {"a": 7.8, "b": 5.3},
-            "id": "1"
-        }' http://localhost:5000/api
+        return jsonify({"jsonrpc": "2.0", "result": result, "id": data.get("id")})
+    except Exception as e:
+        return jsonify({"jsonrpc": "2.0", "error": str(e), "id": data.get("id")}), 400
 
-    Пример ответа:
-
-    HTTP/1.1 200 OK
-    Server: Werkzeug/2.2.2 Python/3.10.6
-    Date: Fri, 09 Dec 2022 19:00:09 GMT
-    Content-Type: application/json
-    Content-Length: 54
-    Connection: close
-
-    {
-      "id": "1",
-      "jsonrpc": "2.0",
-      "result": 13.1
-    }
-    """
-    return operator.add(a, b)
-
-
-if __name__ == '__main__':
-    app.run('0.0.0.0', debug=True)
+if __name__ == "__main__":
+    app.run(debug=True)
