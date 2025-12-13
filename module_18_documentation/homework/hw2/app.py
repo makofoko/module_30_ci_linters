@@ -2,6 +2,7 @@ from flask import Flask, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_restx import Api, Resource, Namespace
 from marshmallow import Schema, fields
+from werkzeug.serving import WSGIRequestHandler
 
 db = SQLAlchemy()
 

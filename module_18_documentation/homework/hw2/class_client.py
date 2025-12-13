@@ -3,7 +3,7 @@ import time
 import logging
 from concurrent.futures import ThreadPoolExecutor
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 
 class APIClient:
     def __init__(self, base_url, use_session=False):
@@ -12,9 +12,6 @@ class APIClient:
 
     def get_book(self, book_id):
         return self.session.get(f"{self.base_url}/api/books/{book_id}")
-
-    def create_author(self, data):
-        return self.session.post(f"{self.base_url}/api/authors/", json=data)
 
 def benchmark(client, n_requests, use_threads=False):
     def task():
@@ -29,21 +26,26 @@ def benchmark(client, n_requests, use_threads=False):
             task()
     return time.time() - start
 
-
 if __name__ == "__main__":
     base_url = "http://127.0.0.1:5000"
-    client = APIClient(base_url, use_session=True)
 
-    # тест: 10 запросов без потоков
-    t1 = benchmark(client, 10, use_threads=False)
-    print("10 запросов без потоков:", t1, "секунд")
+    # все комбинации: -S/+S и -T/+T
+    results = {}
+    for use_session in [False, True]:
+        for use_threads in [False, True]:
+            combo = f"S={'+' if use_session else '-'} T={'+' if use_threads else '-'}"
+            results[combo] = {}
+            client = APIClient(base_url, use_session=use_session)
+            for n in [10, 100, 1000]:
+                t = benchmark(client, n, use_threads=use_threads)
+                results[combo][n] = round(t, 2)
 
-    # тест: 10 запросов с потоками
-    t2 = benchmark(client, 10, use_threads=True)
-    print("10 запросов с потоками:", t2, "секунд")
-
-    # можно добавить 100 и 1000 запросов
+    # выводим таблицу для REPORT.md
+    print("\nREPORT.md таблица:\n")
+    print("+----------------+----------------+----------------+----------------+----------------+")
+    print("| Число запросов | -S -T          | -S +T          | +S -T          | +S +T          |")
+    print("+----------------+----------------+----------------+----------------+----------------+")
     for n in [10, 100, 1000]:
-        t_no_threads = benchmark(client, n, use_threads=False)
-        t_threads = benchmark(client, n, use_threads=True)
-        print(f"{n} запросов: без потоков={t_no_threads:.2f}s, с потоками={t_threads:.2f}s")
+        row = f"| {n:<14} | {results['S=- T=-'][n]:<14} | {results['S=- T=+'][n]:<14} | {results['S=+ T=-'][n]:<14} | {results['S=+ T=+'][n]:<14} |"
+        print(row)
+    print("+----------------+----------------+----------------+----------------+----------------+")
