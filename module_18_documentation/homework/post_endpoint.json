@@ -1,0 +1,27 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Пример API - Эндпоинт POST",
+    "version": "1.0"
+  },
+  "paths": {
+    "/post_hello": {
+      "post": {
+        "summary": "Пример POST-эндпоинта",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "formData",
+            "type": "string",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Успешный ответ"
+          }
+        }
+      }
+    }
+  }
+}

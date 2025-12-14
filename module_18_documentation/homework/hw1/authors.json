@@ -1,5 +1,5 @@
 {
-  "openapi": "3.0.0",
+  "swagger": "2.0",
   "info": {
     "title": "Authors API",
     "version": "1.0"
@@ -8,52 +8,28 @@
     "/api/authors/": {
       "post": {
         "summary": "Создать автора",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": { "$ref": "#/components/schemas/Author" }
-            }
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": { "$ref": "#/definitions/Author" }
           }
-        },
+        ],
         "responses": {
           "201": { "description": "Автор создан" }
         }
       }
-    },
-    "/api/authors/{id}": {
-      "get": {
-        "summary": "Получить автора и его книги",
-        "parameters": [
-          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
-        ],
-        "responses": {
-          "200": { "description": "Успешный ответ" },
-          "404": { "description": "Автор не найден" }
-        }
-      },
-      "delete": {
-        "summary": "Удалить автора и все его книги",
-        "parameters": [
-          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
-        ],
-        "responses": {
-          "200": { "description": "Автор и книги удалены" },
-          "404": { "description": "Автор не найден" }
-        }
-      }
     }
   },
-  "components": {
-    "schemas": {
-      "Author": {
-        "type": "object",
-        "properties": {
-          "id": { "type": "integer" },
-          "first_name": { "type": "string" },
-          "last_name": { "type": "string" },
-          "middle_name": { "type": "string" }
-        }
+  "definitions": {
+    "Author": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "integer" },
+        "first_name": { "type": "string" },
+        "last_name": { "type": "string" },
+        "middle_name": { "type": "string" }
       }
     }
   }

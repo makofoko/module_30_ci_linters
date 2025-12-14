@@ -1,0 +1,9 @@
+summary: Приветственный эндпоинт
+parameters:
+  - name: name
+    in: query
+    type: string
+    required: true
+responses:
+  200:
+    description: Успешный ответ

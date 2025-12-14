@@ -1,59 +1,32 @@
 from flask import Flask, request, jsonify
 from flasgger import Swagger
 from flasgger.utils import swag_from
-from jsonrpcserver import method, dispatch
+from models import db
+from routes import book_ns, author_ns
+from flask_restx import Api
 
 app = Flask(__name__)
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///library.db"
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
+db.init_app(app)
+
 swagger = Swagger(app, template_file='authors.json')
 
+api = Api(app)
+api.add_namespace(book_ns, path="/api/books")
+api.add_namespace(author_ns, path="/api/authors")
 
 @app.route('/api/books/<int:id>', methods=['GET'])
 @swag_from('books.yml')
 def get_book(id):
-    return jsonify({"id": id, "title": f"Book {id}", "author": "Author Name"})
-
-@app.route('/api/authors/', methods=['POST'])
-def create_author():
-    data = request.json
     return jsonify({
-        "id": 1,
-        "first_name": data.get("first_name"),
-        "last_name": data.get("last_name")
-    }), 201
-
-@app.route('/hello')
-@swag_from('hello_endpoint.yaml')
-def hello():
-    return 'Привет, {}'.format(request.args.get('name', 'Мир'))
-
-@app.route('/post_hello', methods=['POST'])
-def post_hello():
-    name = request.form.get('name', 'Мир')
-    return 'Привет, {}'.format(name)
-
-
-@method
-def add(a: int, b: int) -> int:
-    return a + b
-
-@method
-def sub(a: int, b: int) -> int:
-    return a - b
-
-@method
-def mul(a: int, b: int) -> int:
-    return a * b
-
-@method
-def div(a: int, b: int) -> float:
-    if b == 0:
-        raise ZeroDivisionError("Division by zero")
-    return a / b
-
-@app.route("/api", methods=["POST"])
-def rpc():
-    response = dispatch(request.get_data().decode())
-    return response
+        "id": id,
+        "title": f"Book {id}",
+        "author": "Author Name"
+    })
 
 if __name__ == "__main__":
+    with app.app_context():
+        db.create_all()
     app.run(debug=True)
