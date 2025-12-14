@@ -3,6 +3,18 @@ info:
   title: Books API
   version: "1.0"
 paths:
+  /api/books/:
+    post:
+      summary: Создать книгу
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/Book'
+      responses:
+        201:
+          description: Книга создана
   /api/books/{id}:
     get:
       summary: Получить книгу по ID

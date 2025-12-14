@@ -20,6 +20,31 @@
           "201": { "description": "Автор создан" }
         }
       }
+    },
+    "/api/authors/{id}": {
+      "get": {
+        "summary": "Получить автора по ID",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "type": "integer" }
+        ],
+        "responses": {
+          "200": {
+            "description": "Автор найден",
+            "schema": { "$ref": "#/definitions/Author" }
+          },
+          "404": { "description": "Автор не найден" }
+        }
+      },
+      "delete": {
+        "summary": "Удалить автора по ID",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "type": "integer" }
+        ],
+        "responses": {
+          "200": { "description": "Автор и все его книги удалены" },
+          "404": { "description": "Автор не найден" }
+        }
+      }
     }
   },
   "definitions": {
