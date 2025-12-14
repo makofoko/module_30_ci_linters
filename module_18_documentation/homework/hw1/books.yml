@@ -1,4 +1,4 @@
-openapi: 3.0.0
+swagger: "2.0"
 info:
   title: Books API
   version: "1.0"
@@ -10,16 +10,13 @@ paths:
         - name: id
           in: path
           required: true
-          schema:
-            type: integer
+          type: integer
       responses:
-        "200":
-          description: Успешный ответ
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Book'
-        "404":
+        200:
+          description: Книга найдена
+          schema:
+            $ref: '#/definitions/Book'
+        404:
           description: Книга не найдена
     put:
       summary: Обновить книгу по ID
@@ -27,18 +24,16 @@ paths:
         - name: id
           in: path
           required: true
+          type: integer
+        - name: body
+          in: body
+          required: true
           schema:
-            type: integer
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Book'
+            $ref: '#/definitions/Book'
       responses:
-        "200":
+        200:
           description: Книга обновлена
-        "404":
+        404:
           description: Автор не найден
     delete:
       summary: Удалить книгу по ID
@@ -46,21 +41,19 @@ paths:
         - name: id
           in: path
           required: true
-          schema:
-            type: integer
+          type: integer
       responses:
-        "200":
+        200:
           description: Книга удалена
-        "404":
+        404:
           description: Книга не найдена
-components:
-  schemas:
-    Book:
-      type: object
-      properties:
-        id:
-          type: integer
-        title:
-          type: string
-        author_id:
-          type: integer
+definitions:
+  Book:
+    type: object
+    properties:
+      id:
+        type: integer
+      title:
+        type: string
+      author_id:
+        type: integer
