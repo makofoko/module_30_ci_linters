@@ -1,17 +1,16 @@
 from flask import Flask, request, jsonify
-from sqlalchemy import create_engine
+from datetime import date
 from sqlalchemy.orm import sessionmaker
+from orm import engine, Book, ReceivingBooks
 
 app = Flask(__name__)
-
-engine = create_engine("sqlite:///library.db")
 Session = sessionmaker(bind=engine)
 
 @app.route("/books", methods=["GET"])
 def get_books():
     session = Session()
     books = session.query(Book).all()
-    return jsonify([{"id": b.id, "title": b.title} for b in books])
+    return jsonify([{"id": b.id, "title": b.title, "author_id": b.author_id} for b in books])
 
 @app.route("/debtors", methods=["GET"])
 def get_debtors():
@@ -20,7 +19,7 @@ def get_debtors():
         ReceivingBooks.date_return == None,
         ReceivingBooks.count_date_with_book > 14
     ).all()
-    return jsonify([{"student_id": d.student_id, "book_id": d.book_id} for d in debtors])
+    return jsonify([{"student_id": d.student_id, "book_id": d.book_id, "days": d.count_date_with_book} for d in debtors])
 
 @app.route("/give_book", methods=["POST"])
 def give_book():
@@ -35,17 +34,16 @@ def give_book():
 def return_book():
     session = Session()
     data = request.json
-    rb = session.query(ReceivingBooks).filter_by(student_id=data["student_id"], book_id=data["book_id"], date_return=None).first()
+    rb = session.query(ReceivingBooks).filter_by(
+        student_id=data["student_id"],
+        book_id=data["book_id"],
+        date_return=None
+    ).first()
     if not rb:
         return jsonify({"error": "no such record"}), 400
     rb.date_return = date.today()
     session.commit()
     return jsonify({"status": "book returned"})
 
-@app.route("/search_book", methods=["GET"])
-def search_book():
-    session = Session()
-    query = request.args.get("q", "")
-    books = session.query(Book).filter(Book.title.like(f"%{query}%")).all()
-    return jsonify([{"id": b.id, "title": b.title} for b in books])
-if __name__ == "__main__": app.run(debug=True)
+if __name__ == "__main__":
+    app.run(debug=True)
