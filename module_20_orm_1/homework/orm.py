@@ -1,65 +1,26 @@
-from sqlalchemy import Column, Integer, String, Float, Date, create_engine, func, case
-from sqlalchemy.orm import declarative_base
-from sqlalchemy.ext.hybrid import hybrid_property
-from datetime import date
+from init_db import Base, engine, Author, Book, Student, ReceivingBooks
+from sqlalchemy.orm import sessionmaker
+from datetime import date, timedelta
 
-Base = declarative_base()
-engine = create_engine("sqlite:///library.db", echo=True)
+Session = sessionmaker(bind=engine)
+session = Session()
 
+Base.metadata.drop_all(engine)
+Base.metadata.create_all(engine)
 
-class Author(Base):
-    __tablename__ = "authors"
-    id = Column(Integer, primary_key=True)
-    name = Column(String)
+author1 = Author(name="Лев Толстой")
+author2 = Author(name="Фёдор Достоевский")
 
+book1 = Book(title="Война и мир", author=author1)
+book2 = Book(title="Преступление и наказание", author=author2)
 
-class Book(Base):
-    __tablename__ = "books"
-    id = Column(Integer, primary_key=True)
-    title = Column(String)
-    author_id = Column(Integer)
+student1 = Student(name="Мағжан", dormitory=1, avg_grade=4.5)
+student2 = Student(name="Айжан", dormitory=0, avg_grade=3.8)
 
+rb1 = ReceivingBooks(student=student1, book=book1, date_receiving=date.today() - timedelta(days=20))
+rb2 = ReceivingBooks(student=student2, book=book2, date_receiving=date.today() - timedelta(days=5))
 
-class Student(Base):
-    __tablename__ = "students"
-    id = Column(Integer, primary_key=True)
-    name = Column(String)
-    dormitory = Column(Integer)
-    avg_grade = Column(Float)
+session.add_all([author1, author2, book1, book2, student1, student2, rb1, rb2])
+session.commit()
 
-    @classmethod
-    def with_dormitory(cls, session):
-        return session.query(cls).filter(cls.dormitory == 1).all()
-
-    @classmethod
-    def with_avg_grade_above(cls, session, threshold):
-        return session.query(cls).filter(cls.avg_grade > threshold).all()
-
-
-class ReceivingBooks(Base):
-    __tablename__ = "receiving_books"
-    id = Column(Integer, primary_key=True)
-    student_id = Column(Integer)
-    book_id = Column(Integer)
-    date_receiving = Column(Date)
-    date_return = Column(Date, nullable=True)
-
-    @hybrid_property
-    def count_date_with_book(self):
-        if self.date_return:
-            return (self.date_return - self.date_receiving).days
-        return (date.today() - self.date_receiving).days
-
-    @count_date_with_book.expression
-    def count_date_with_book(cls):
-        return case(
-            [
-                (cls.date_return != None, func.julianday(cls.date_return) - func.julianday(cls.date_receiving))
-            ],
-            else_=func.julianday(func.current_date()) - func.julianday(cls.date_receiving)
-        )
-
-
-if __name__ == "__main__":
-    Base.metadata.create_all(engine)
-    print("Таблицы созданы в library.db")
+print("База инициализирована тестовыми данными")

@@ -1,26 +1,60 @@
-from orm import engine, Author, Book, Student, ReceivingBooks, Base
-from sqlalchemy.orm import sessionmaker
-from datetime import date, timedelta
+from sqlalchemy import Column, Integer, String, Float, Date, ForeignKey, create_engine, func, case
+from sqlalchemy.orm import declarative_base, relationship
+from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.ext.associationproxy import association_proxy
+from datetime import date
 
-Session = sessionmaker(bind=engine)
-session = Session()
+Base = declarative_base()
+engine = create_engine("sqlite:///library.db", echo=True)
 
-Base.metadata.drop_all(engine)
-Base.metadata.create_all(engine)
+class Author(Base):
+    __tablename__ = "authors"
+    id = Column(Integer, primary_key=True)
+    name = Column(String)
+    books = relationship("Book", back_populates="author", cascade="all, delete-orphan")
 
-author1 = Author(name="Лев Толстой")
-author2 = Author(name="Фёдор Достоевский")
+class Book(Base):
+    __tablename__ = "books"
+    id = Column(Integer, primary_key=True)
+    title = Column(String)
+    author_id = Column(Integer, ForeignKey("authors.id"))
+    author = relationship("Author", back_populates="books")
+    receiving_books = relationship("ReceivingBooks", back_populates="book", cascade="all, delete-orphan")
+    students = association_proxy("receiving_books", "student")
 
-book1 = Book(title="Война и мир", author_id=1)
-book2 = Book(title="Преступление и наказание", author_id=2)
+class Student(Base):
+    __tablename__ = "students"
+    id = Column(Integer, primary_key=True)
+    name = Column(String)
+    dormitory = Column(Integer)
+    avg_grade = Column(Float)
+    receiving_books = relationship("ReceivingBooks", back_populates="student", cascade="all, delete-orphan")
+    books = association_proxy("receiving_books", "book")
 
-student1 = Student(name="Мағжан", dormitory=1, avg_grade=4.5)
-student2 = Student(name="Айжан", dormitory=0, avg_grade=3.8)
+class ReceivingBooks(Base):
+    __tablename__ = "receiving_books"
+    id = Column(Integer, primary_key=True)
+    student_id = Column(Integer, ForeignKey("students.id"))
+    book_id = Column(Integer, ForeignKey("books.id"))
+    date_receiving = Column(Date)
+    date_return = Column(Date, nullable=True)
 
-rb1 = ReceivingBooks(student_id=1, book_id=1, date_receiving=date.today() - timedelta(days=20))
-rb2 = ReceivingBooks(student_id=2, book_id=2, date_receiving=date.today() - timedelta(days=5))
+    student = relationship("Student", back_populates="receiving_books")
+    book = relationship("Book", back_populates="receiving_books")
 
-session.add_all([author1, author2, book1, book2, student1, student2, rb1, rb2])
-session.commit()
+    @hybrid_property
+    def count_date_with_book(self):
+        if self.date_return:
+            return (self.date_return - self.date_receiving).days
+        return (date.today() - self.date_receiving).days
 
-print("База инициализирована тестовыми данными")
+    @count_date_with_book.expression
+    def count_date_with_book(cls):
+        return case(
+            [(cls.date_return != None, func.julianday(cls.date_return) - func.julianday(cls.date_receiving))],
+            else_=func.julianday(func.current_date()) - func.julianday(cls.date_receiving)
+        )
+
+if __name__ == "__main__":
+    Base.metadata.create_all(engine)
+    print("Таблицы созданы в library.db")
