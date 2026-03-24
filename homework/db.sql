@@ -14,7 +14,8 @@ CREATE TABLE IF NOT EXISTS students (
     id INTEGER PRIMARY KEY,
     name TEXT NOT NULL,
     dormitory INTEGER,
-    avg_grade FLOAT
+    avg_grade FLOAT,
+    phone TEXT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS receiving_books (

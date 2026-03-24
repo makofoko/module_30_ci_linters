@@ -14,8 +14,8 @@ author2 = Author(name="Фёдор Достоевский")
 book1 = Book(title="Война и мир", author=author1)
 book2 = Book(title="Преступление и наказание", author=author2)
 
-student1 = Student(name="Мағжан", dormitory=1, avg_grade=4.5)
-student2 = Student(name="Айжан", dormitory=0, avg_grade=3.8)
+student1 = Student(name="Мағжан", dormitory=1, avg_grade=4.5, phone="+7(911)-123-45-67")
+student2 = Student(name="Айжан", dormitory=0, avg_grade=3.8, phone="+7(922)-987-65-43")
 
 rb1 = ReceivingBooks(student=student1, book=book1, date_receiving=date.today() - timedelta(days=20))
 rb2 = ReceivingBooks(student=student2, book=book2, date_receiving=date.today() - timedelta(days=5))

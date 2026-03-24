@@ -3,6 +3,8 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy import func
 from init_db import engine, Author, Book, Student, ReceivingBooks
 from datetime import date
+import csv
+from io import StringIO
 
 app = Flask(__name__)
 Session = sessionmaker(bind=engine)
@@ -40,6 +42,18 @@ def top_students():
     year = date.today().year
     students = session.query(Student.name, func.count(ReceivingBooks.id).label("cnt")).join(ReceivingBooks).filter(func.strftime("%Y", ReceivingBooks.date_receiving) == str(year)).group_by(Student.id).order_by(func.count(ReceivingBooks.id).desc()).limit(10).all()
     return jsonify([{"name": s.name, "count": s.cnt} for s in students])
+
+# 🔹 Новый роут: загрузка CSV
+@app.route("/upload_students", methods=["POST"])
+def upload_students():
+    session = Session()
+    file = request.files["file"]
+    stream = StringIO(file.stream.read().decode("utf-8"))
+    reader = csv.DictReader(stream, delimiter=";")
+    students = [dict(row) for row in reader]
+    session.bulk_insert_mappings(Student, students)
+    session.commit()
+    return jsonify({"status": "students uploaded", "count": len(students)})
 
 if __name__ == "__main__":
     app.run(debug=True)
