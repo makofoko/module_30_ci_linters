@@ -1,0 +1,61 @@
+version: "3.9"
+
+services:
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+    networks:
+      - homework_net
+
+  flask:
+    build: .
+    command: python -m homework.app
+    volumes:
+      - .:/app
+    ports:
+      - "5000:5000"
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    networks:
+      - homework_net
+
+  worker:
+    build: .
+    command: celery -A homework.celery_app.celery_app worker --loglevel=info -E
+    volumes:
+      - .:/app
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    networks:
+      - homework_net
+
+  beat:
+    build: .
+    command: celery -A homework.celery_app.celery_app beat --loglevel=info --schedule=/app/celerybeat-schedule.db
+    volumes:
+      - .:/app
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    networks:
+      - homework_net
+
+  flower:
+    build: .
+    command: celery -A homework.celery_app.celery_app flower --port=5555
+    volumes:
+      - .:/app
+    ports:
+      - "5555:5555"
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    networks:
+      - homework_net
+
+networks:
+  homework_net:
+    driver: bridge

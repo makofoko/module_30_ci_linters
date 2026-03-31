@@ -2,20 +2,27 @@
 Здесь происходит логика обработки изображения
 """
 
-from typing import Optional
-
 from PIL import Image, ImageFilter
+import os
+from homework.celery_app import celery_app
 
+RESULT_FOLDER = "results"
+os.makedirs(RESULT_FOLDER, exist_ok=True)
 
-def blur_image(src_filename: str, dst_filename: Optional[str] = None):
-    """
-    Функция принимает на вход имя входного и выходного файлов.
-    Применяет размытие по Гауссу со значением 5.
-    """
-    if not dst_filename:
-        dst_filename = f'blur_{src_filename}'
+@celery_app.task
+def blur_image_task(filepath):
+    img = Image.open(filepath)
+    blurred = img.filter(ImageFilter.GaussianBlur(5))
 
-    with Image.open(src_filename) as img:
-        img.load()
-        new_img = img.filter(ImageFilter.GaussianBlur(5))
-        new_img.save(dst_filename)
+    if blurred.mode == "RGBA":
+        blurred = blurred.convert("RGB")
+
+    filename = os.path.basename(filepath)
+    result_path = os.path.join(RESULT_FOLDER, f"blurred_{filename}")
+
+    if filename.lower().endswith(".png"):
+        blurred.save(result_path, format="PNG")
+    else:
+        blurred.save(result_path, format="JPEG")
+
+    return result_path
