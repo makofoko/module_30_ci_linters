@@ -3,5 +3,6 @@
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$/python_advanced/module_21_orm_2" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/python_advanced/module_22_celery" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/python_advanced/module_23_cgi_server" vcs="Git" />
   </component>
 </project>
