@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="ru" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alatau Meadows — Горный Эко-Курорт</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --forest-green: #1a3c34;
+            --meadow-gold: #d4af37;
+        }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .hero-gradient {
+            background: linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.35)), url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&q=80&w=2070');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+
+        .glass-dark {
+            background: rgba(26, 60, 52, 0.85);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .card-hover {
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .card-hover:hover {
+            transform: translateY(-12px);
+            box-shadow: 0 30px 60px -12px rgba(26, 60, 52, 0.25);
+        }
+
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #d4af37; border-radius: 10px; }
+
+        @keyframes fadeInScale {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .animate-modal { animation: fadeInScale 0.3s ease-out forwards; }
+    </style>
+</head>
+<body class="bg-stone-50 text-stone-900 custom-scrollbar">
+
+    <header class="fixed w-full top-0 z-[100] transition-all duration-500" id="main-nav">
+        <nav class="container mx-auto px-6 py-5 flex items-center justify-between">
+            <div class="flex items-center space-x-3 group cursor-pointer">
+                <div class="w-12 h-12 bg-emerald-900 rounded-full flex items-center justify-center text-white text-2xl shadow-lg border border-yellow-500/30 transition-transform group-hover:rotate-12">
+                    🏔️
+                </div>
+                <div>
+                    <span class="block font-extrabold text-xl tracking-tight text-white leading-none">ALATAU</span>
+                    <span class="block text-xs font-semibold text-yellow-500 tracking-[0.3em] uppercase">Meadows</span>
+                </div>
+            </div>
+
+            <div class="hidden md:flex items-center space-x-10">
+                <a href="#rooms" class="text-xs font-black text-white/70 hover:text-yellow-500 transition-colors uppercase tracking-widest">Проживание</a>
+                <a href="#booking" class="text-xs font-black text-white/70 hover:text-yellow-500 transition-colors uppercase tracking-widest">Бронирование</a>
+            </div>
+
+            <div class="flex items-center space-x-6">
+                <div id="auth-section" class="flex items-center space-x-4">
+                    <button onclick="openModal('auth')" class="text-white hover:text-yellow-500 transition-colors hidden sm:block">
+                        <span id="user-name-display" class="font-bold text-sm uppercase tracking-wider">Войти</span>
+                    </button>
+                    <a href="#booking" class="bg-yellow-500 hover:bg-yellow-600 text-emerald-950 px-6 py-3 rounded-full font-extrabold text-xs uppercase tracking-tighter shadow-xl transition-all hover:scale-105 active:scale-95">
+                        Забронировать
+                    </a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <section class="hero-gradient h-screen flex items-center relative overflow-hidden">
+        <div class="container mx-auto px-6 relative z-10">
+            <div class="max-w-4xl">
+                <span class="inline-block bg-yellow-500/20 backdrop-blur-md border border-yellow-500/30 text-yellow-400 px-4 py-2 rounded-full text-xs font-black uppercase tracking-[0.4em] mb-8">
+                    Премиальный Эко-Отдых в Казахстане
+                </span>
+                <h1 class="text-6xl md:text-9xl font-extrabold text-white mb-8 leading-[0.9] tracking-tighter">
+                    Там, где <br> <span class="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-emerald-400">небо</span> касается гор
+                </h1>
+                <p class="text-xl md:text-2xl text-white/70 max-w-2xl font-light leading-relaxed mb-12">
+                    Погрузитесь в атмосферу уединения и тишины среди вековых сосен Заилийского Алатау. Роскошь, рожденная природой.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-6">
+                    <a href="#rooms" class="group flex items-center justify-center space-x-4 bg-white text-emerald-950 px-10 py-5 rounded-2xl font-black transition-all hover:bg-yellow-500">
+                        <span>Смотреть номера</span>
+                        <span class="group-hover:translate-x-2 transition-transform">→</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-stone-50 to-transparent"></div>
+    </section>
+
+    <section id="rooms" class="py-32 bg-stone-50">
+        <div class="container mx-auto px-6">
+            <div class="flex flex-col md:flex-row justify-between items-end mb-20">
+                <div>
+                    <h2 class="text-5xl font-black text-emerald-950 mb-4">Наши апартаменты</h2>
+                    <p class="text-stone-500 text-xl max-w-xl font-light">Архитектура, вдохновленная ландшафтом.</p>
+                </div>
+                <div class="mt-8 md:mt-0 flex space-x-2 bg-stone-200 p-1.5 rounded-2xl">
+                    <button onclick="filterRooms('all', this)" class="px-6 py-3 rounded-xl font-bold transition-all filter-btn bg-emerald-950 text-white shadow-lg">Все</button>
+                    <button onclick="filterRooms('chalet', this)" class="px-6 py-3 rounded-xl font-bold transition-all filter-btn text-emerald-950 hover:bg-stone-300">Шале</button>
+                    <button onclick="filterRooms('glamp', this)" class="px-6 py-3 rounded-xl font-bold transition-all filter-btn text-emerald-950 hover:bg-stone-300">Глэмпинг</button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-10" id="rooms-grid">
+                <!-- Шале 1 -->
+                <div class="room-card chalet card-hover group cursor-pointer" onclick="selectRoom('Chalet Royal', 120000)">
+                    <div class="relative h-[500px] overflow-hidden rounded-[2.5rem] mb-6 shadow-2xl">
+                        <img src="https://images.unsplash.com/photo-1518732714860-b62714ce0c59?auto=format&fit=crop&q=80&w=2070" class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" alt="Chalet">
+                        <div class="absolute top-6 right-6 bg-white/90 backdrop-blur-md px-5 py-2 rounded-2xl shadow-xl">
+                            <span class="font-black text-emerald-950">120 000 ₸</span>
+                        </div>
+                    </div>
+                    <h3 class="text-2xl font-extrabold text-emerald-950 mb-2">Chalet Royal</h3>
+                    <p class="text-stone-500 mb-6 font-medium">Панорамный вид на пики и собственный камин.</p>
+                    <div class="flex items-center space-x-6 text-emerald-800/50 font-bold text-xs uppercase tracking-widest">
+                        <span>85 м²</span>
+                        <span>•</span>
+                        <span>4 гостя</span>
+                        <span>•</span>
+                        <span>Джакузи</span>
+                    </div>
+                </div>
+
+                <!-- Глэмпинг 1 -->
+                <div class="room-card glamp card-hover group cursor-pointer" onclick="selectRoom('Crystal Dome', 85000)">
+                    <div class="relative h-[500px] overflow-hidden rounded-[2.5rem] mb-6 shadow-2xl">
+                        <img src="https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?auto=format&fit=crop&q=80&w=2070" class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" alt="Dome">
+                        <div class="absolute top-6 right-6 bg-white/90 backdrop-blur-md px-5 py-2 rounded-2xl shadow-xl">
+                            <span class="font-black text-emerald-950">85 000 ₸</span>
+                        </div>
+                    </div>
+                    <h3 class="text-2xl font-extrabold text-emerald-950 mb-2">Crystal Dome</h3>
+                    <p class="text-stone-500 mb-6 font-medium">Стеклянная сфера для наблюдения за Млечным Путем.</p>
+                    <div class="flex items-center space-x-6 text-emerald-800/50 font-bold text-xs uppercase tracking-widest">
+                        <span>42 м²</span>
+                        <span>•</span>
+                        <span>2 гостя</span>
+                        <span>•</span>
+                        <span>Терраса</span>
+                    </div>
+                </div>
+
+                <!-- Шале 2 -->
+                <div class="room-card chalet card-hover group cursor-pointer" onclick="selectRoom('Forest A-Frame', 65000)">
+                    <div class="relative h-[500px] overflow-hidden rounded-[2.5rem] mb-6 shadow-2xl">
+                        <img src="https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&q=80&w=2070" class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" alt="A-Frame">
+                        <div class="absolute top-6 right-6 bg-white/90 backdrop-blur-md px-5 py-2 rounded-2xl shadow-xl">
+                            <span class="font-black text-emerald-950">65 000 ₸</span>
+                        </div>
+                    </div>
+                    <h3 class="text-2xl font-extrabold text-emerald-950 mb-2">Forest A-Frame</h3>
+                    <p class="text-stone-500 mb-6 font-medium">Уютный треугольный домик в чаще соснового бора.</p>
+                    <div class="flex items-center space-x-6 text-emerald-800/50 font-bold text-xs uppercase tracking-widest">
+                        <span>38 м²</span>
+                        <span>•</span>
+                        <span>2 гостя</span>
+                        <span>•</span>
+                        <span>Барбекю</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="booking" class="py-32 bg-emerald-950 text-white overflow-hidden relative">
+        <div class="absolute top-0 right-0 w-1/3 h-full bg-yellow-500/5 -skew-x-12 transform translate-x-20"></div>
+
+        <div class="container mx-auto px-6 relative z-10">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
+                <div>
+                    <h2 class="text-6xl font-black mb-8 leading-tight tracking-tighter">Спланируйте свой <br><span class="text-yellow-500">момент спокойствия</span></h2>
+                    <p class="text-emerald-200/70 text-xl mb-12 font-light">Выберите категорию проживания. Наша система рассчитает стоимость с учетом всех привилегий резидента.</p>
+
+                    <div class="space-y-10">
+                        <div class="flex items-start space-x-6">
+                            <div class="w-14 h-14 bg-white/5 rounded-2xl flex items-center justify-center text-2xl border border-white/10">✨</div>
+                            <div>
+                                <h4 class="font-bold text-yellow-500 mb-1">Все включено</h4>
+                                <p class="text-emerald-300/60 text-sm">Фермерские завтраки и доступ в SPA-зону уже в стоимости.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-6">
+                            <div class="w-14 h-14 bg-white/5 rounded-2xl flex items-center justify-center text-2xl border border-white/10">🛡️</div>
+                            <div>
+                                <h4 class="font-bold text-yellow-500 mb-1">Гибкость</h4>
+                                <p class="text-emerald-300/60 text-sm">Бесплатный перенос дат за 72 часа до прибытия.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-[3.5rem] p-8 md:p-14 text-stone-900 shadow-2xl relative">
+                    <form id="booking-form" class="space-y-8">
+                        <div class="relative">
+                            <label class="block text-[10px] font-black text-stone-400 uppercase tracking-[0.2em] mb-4">Категория номера</label>
+                            <select id="room-select" class="w-full bg-stone-100 border-none rounded-2xl p-5 font-bold focus:ring-2 focus:ring-yellow-500 transition-all appearance-none cursor-pointer" onchange="updateUI()">
+                                <option value="120000">Chalet Royal (120 000 ₸/ночь)</option>
+                                <option value="85000">Crystal Dome (85 000 ₸/ночь)</option>
+                                <option value="65000" selected>Forest A-Frame (65 000 ₸/ночь)</option>
+                            </select>
+                            <div class="absolute right-5 bottom-5 pointer-events-none text-stone-400">▼</div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-[10px] font-black text-stone-400 uppercase tracking-[0.2em] mb-4">Ночей</label>
+                                <input type="number" id="nights" min="1" value="1" class="w-full bg-stone-100 border-none rounded-2xl p-5 font-bold outline-none focus:ring-2 focus:ring-yellow-500" oninput="updateUI()">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-black text-stone-400 uppercase tracking-[0.2em] mb-4">Гостей</label>
+                                <input type="number" id="guests" min="1" max="4" value="2" class="w-full bg-stone-100 border-none rounded-2xl p-5 font-bold outline-none focus:ring-2 focus:ring-yellow-500">
+                            </div>
+                        </div>
+
+                        <div class="pt-8 border-t border-stone-100">
+                            <div class="flex justify-between items-end mb-8">
+                                <div>
+                                    <p class="text-stone-400 text-[10px] font-black uppercase mb-1">Полная стоимость</p>
+                                    <p id="total-price" class="text-5xl font-black text-emerald-950 tracking-tighter">65 000 ₸</p>
+                                </div>
+                                <p class="text-stone-400 text-[10px] font-bold italic bg-stone-100 px-3 py-1 rounded-full uppercase">KZT</p>
+                            </div>
+                            <button type="button" onclick="handleBooking()" class="w-full py-6 bg-emerald-950 text-white rounded-2xl font-black text-lg hover:bg-emerald-900 transition-all shadow-xl active:scale-95 group">
+                                Забронировать сейчас
+                                <span class="inline-block ml-2 group-hover:translate-x-1 transition-transform">→</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="bg-stone-100 py-24">
+        <div class="container mx-auto px-6">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-16 mb-20">
+                <div class="col-span-1 md:col-span-2">
+                    <div class="flex items-center space-x-3 mb-6">
+                        <span class="text-3xl">🏔️</span>
+                        <h3 class="text-xl font-black tracking-tighter">ALATAU MEADOWS</h3>
+                    </div>
+                    <p class="text-stone-500 font-medium max-w-sm mb-8 leading-relaxed">Создаем условия для глубокой регенерации и единения с природой Заилийского Алатау с 2018 года.</p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-md hover:text-yellow-600 transition-colors">IG</a>
+                        <a href="#" class="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-md hover:text-yellow-600 transition-colors">FB</a>
+                        <a href="#" class="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-md hover:text-yellow-600 transition-colors">WA</a>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="font-black uppercase text-[10px] tracking-widest text-stone-400 mb-6">Навигация</h4>
+                    <ul class="space-y-4 font-bold text-emerald-950">
+                        <li><a href="#" class="hover:text-yellow-600">Апартаменты</a></li>
+                        <li><a href="#" class="hover:text-yellow-600">Оздоровление</a></li>
+                        <li><a href="#" class="hover:text-yellow-600">Ресторан</a></li>
+                        <li><a href="#" class="hover:text-yellow-600">Мероприятия</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-black uppercase text-[10px] tracking-widest text-stone-400 mb-6">Контакт</h4>
+                    <ul class="space-y-4 font-bold text-emerald-950 text-sm">
+                        <li>info@alataumeadows.kz</li>
+                        <li>+7 (777) 123 45 67</li>
+                        <li>Алматинская обл., <br>ущелье Алма-Арасан</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="pt-12 border-t border-stone-200 flex flex-col md:flex-row justify-between items-center text-[10px] font-black text-stone-400 uppercase tracking-widest">
+                <p>© 2026 Alatau Meadows Resort. All rights reserved.</p>
+                <div class="flex space-x-8 mt-6 md:mt-0">
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms of Service</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Модальное окно Авторизации -->
+    <div id="auth-modal" class="fixed inset-0 z-[200] hidden bg-emerald-950/70 backdrop-blur-md flex items-center justify-center p-6 transition-opacity duration-300">
+        <div class="bg-white rounded-[3rem] w-full max-w-lg p-10 md:p-14 relative shadow-2xl animate-modal">
+            <button onclick="closeModal('auth')" class="absolute top-8 right-8 text-stone-300 hover:text-stone-900 transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+            <h3 class="text-3xl font-black mb-4 leading-tight">Добро пожаловать <br><span class="text-yellow-600">в Клуб Резидентов</span></h3>
+            <p class="text-stone-400 mb-10 font-medium">Получите доступ к персональным скидкам и раннему бронированию.</p>
+
+            <div class="space-y-6">
+                <div>
+                    <label class="block text-[10px] font-black text-stone-400 uppercase tracking-widest mb-3 ml-1">Ваше полное имя</label>
+                    <input type="text" id="user-name-input" class="w-full bg-stone-100 border-none rounded-2xl p-5 font-bold focus:ring-2 focus:ring-yellow-500 transition-all outline-none" placeholder="Константин Константинопольский">
+                </div>
+                <button onclick="handleLogin()" class="w-full py-5 bg-emerald-950 text-white rounded-2xl font-black text-lg hover:bg-emerald-900 shadow-xl transition-all active:scale-95">
+                    Подтвердить вход
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно Успешного бронирования -->
+    <div id="success-modal" class="fixed inset-0 z-[300] hidden bg-emerald-950/80 backdrop-blur-xl flex items-center justify-center p-6">
+        <div class="bg-white rounded-[4rem] w-full max-w-2xl p-16 text-center shadow-2xl animate-modal">
+            <div class="w-24 h-24 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-5xl mx-auto mb-10">✓</div>
+            <h3 class="text-4xl font-black mb-4 text-emerald-950">Заявка принята</h3>
+            <p id="success-message" class="text-stone-500 text-xl font-light mb-12"></p>
+            <button onclick="closeModal('success')" class="px-12 py-5 bg-emerald-950 text-white rounded-2xl font-black hover:bg-emerald-900 transition-all">Вернуться на главную</button>
+        </div>
+    </div>
+
+    <script>
+        window.addEventListener('scroll', () => {
+            const nav = document.getElementById('main-nav');
+            if (window.scrollY > 80) {
+                nav.classList.add('glass-dark', 'py-3');
+                nav.classList.remove('py-5');
+            } else {
+                nav.classList.remove('glass-dark', 'py-3');
+                nav.classList.add('py-5');
+            }
+        });
+
+        function filterRooms(category, btn) {
+            const cards = document.querySelectorAll('.room-card');
+            const btns = document.querySelectorAll('.filter-btn');
+
+            // Стиль кнопок
+            btns.forEach(b => {
+                b.classList.remove('bg-emerald-950', 'text-white', 'shadow-lg');
+                b.classList.add('text-emerald-950', 'hover:bg-stone-300');
+            });
+            btn.classList.add('bg-emerald-950', 'text-white', 'shadow-lg');
+            btn.classList.remove('text-emerald-950', 'hover:bg-stone-300');
+
+            // Фильтрация
+            cards.forEach(card => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(10px)';
+
+                setTimeout(() => {
+                    if (category === 'all' || card.classList.contains(category)) {
+                        card.style.display = 'block';
+                        setTimeout(() => {
+                            card.style.opacity = '1';
+                            card.style.transform = 'translateY(0)';
+                        }, 50);
+                    } else {
+                        card.style.display = 'none';
+                    }
+                }, 300);
+            });
+        }
+
+        function updateUI() {
+            const price = parseInt(document.getElementById('room-select').value);
+            const nights = parseInt(document.getElementById('nights').value) || 1;
+            const total = price * nights;
+            document.getElementById('total-price').textContent = total.toLocaleString() + ' ₸';
+        }
+
+        function selectRoom(name, price) {
+            const select = document.getElementById('room-select');
+            // Находим нужный option по значению
+            Array.from(select.options).forEach((opt, idx) => {
+                if (parseInt(opt.value) === price) select.selectedIndex = idx;
+            });
+            document.getElementById('booking').scrollIntoView({ behavior: 'smooth' });
+            updateUI();
+        }
+
+        function handleBooking() {
+            const user = localStorage.getItem('alatau_user');
+            if (!user) {
+                openModal('auth');
+                return;
+            }
+
+            const total = document.getElementById('total-price').textContent;
+            const msg = `Уважаемый(ая) ${user}, ваша бронь на сумму ${total} успешно создана. Менеджер свяжется с вами для подтверждения.`;
+
+            document.getElementById('success-message').innerText = msg;
+            openModal('success');
+        }
+
+        function openModal(id) {
+            const modal = document.getElementById(id + '-modal');
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal(id) {
+            const modal = document.getElementById(id + '-modal');
+            modal.classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        function handleLogin() {
+            const name = document.getElementById('user-name-input').value.trim() || 'Гость';
+            localStorage.setItem('alatau_user', name);
+            updateUserDisplay(name);
+            closeModal('auth');
+        }
+
+        function updateUserDisplay(name) {
+            const display = document.getElementById('user-name-display');
+            if (display) display.textContent = name;
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedUser = localStorage.getItem('alatau_user');
+            if (savedUser) updateUserDisplay(savedUser);
+            updateUI();
+        });
+    </script>
+</body>
+</html>
