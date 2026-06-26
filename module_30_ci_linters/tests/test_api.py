@@ -1,15 +1,10 @@
-import pytest
-from httpx import AsyncClient
-from app import app
+from fastapi.testclient import TestClient
+from module_30_ci_linters.homework.hw1.app import app
 
-@pytest.mark.asyncio
-async def test_create_recipe():
-    async with AsyncClient(app=app, base_url="http://test") as ac:
-        response = await ac.post("/recipes/", json={
-            "title": "Борщ",
-            "cook_time": 60,
-            "ingredients": "свекла, капуста, мясо",
-            "description": "Классический борщ"
-        })
+client = TestClient(app)
+
+
+def test_get_recipes_empty():
+    response = client.get("/recipes/")
     assert response.status_code == 200
-    assert response.json()["title"] == "Борщ"
+    assert response.json() == []
