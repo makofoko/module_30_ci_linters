@@ -1,10 +1,9 @@
 fastapi
 sqlalchemy
 aiosqlite
+flask
 pytest
-httpx
+mypy
 black
 isort
 flake8
-mypy
-flask

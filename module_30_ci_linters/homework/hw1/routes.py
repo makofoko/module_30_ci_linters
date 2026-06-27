@@ -45,4 +45,3 @@ async def create_recipe(
     await db.commit()
     await db.refresh(new_recipe)
     return new_recipe
-
