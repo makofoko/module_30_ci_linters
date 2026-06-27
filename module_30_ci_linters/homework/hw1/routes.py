@@ -30,7 +30,7 @@ async def get_recipe(recipe_id: int, db: AsyncSession = Depends(get_db)):
         select(models.Recipe).where(models.Recipe.id == recipe_id)
     )
     recipe = result.scalar_one()
-    recipe.views += 1
+    recipe.views = recipe.views + 1  # исправлено для mypy
     await db.commit()
     return recipe
 
@@ -45,3 +45,4 @@ async def create_recipe(
     await db.commit()
     await db.refresh(new_recipe)
     return new_recipe
+

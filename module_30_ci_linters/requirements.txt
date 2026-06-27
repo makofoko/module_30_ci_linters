@@ -1,4 +1,4 @@
-fastapi[all]
+fastapi
 sqlalchemy
 aiosqlite
 pytest
@@ -7,3 +7,4 @@ black
 isort
 flake8
 mypy
+flask
