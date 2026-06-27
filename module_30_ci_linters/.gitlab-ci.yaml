@@ -1,20 +1,33 @@
+image: python:3.11
+
 stages:
   - lint
   - test
 
-lint:
-  stage: lint
-  image: python:3.11
-  script:
-    - pip install -r requirements.txt
-    - black --check module_30_ci_linters/homework/hw1
-    - isort --check-only module_30_ci_linters/homework/hw1
-    - flake8 module_30_ci_linters/homework/hw1
-    - mypy module_30_ci_linters/homework/hw1
+before_script:
+  - pip install -r requirements.txt
 
-test:
-  stage: test
-  image: python:3.11
+mypy:
+  stage: lint
   script:
-    - pip install -r requirements.txt
-    - pytest -v
+    - mypy module_30_ci_linters
+
+black:
+  stage: lint
+  script:
+    - black --diff --check module_30_ci_linters
+
+isort:
+  stage: lint
+  script:
+    - isort --check-only module_30_ci_linters
+
+flake8:
+  stage: lint
+  script:
+    - flake8 module_30_ci_linters
+
+pytest:
+  stage: test
+  script:
+    - pytest module_30_ci_linters/tests -v
