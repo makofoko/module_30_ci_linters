@@ -1,18 +1,38 @@
+"""Module with some typical mistakes. They aimed to be find by linters."""
+
 from typing import Optional
 
+
 class BadClass:
-    def __init__(self, value: int) -> None:
-        self.value = value
+    # Исправлено: 42 — это int, а не str
+    value: int = 42
 
-    def get_value(self) -> int:
-        return self.value
+    def get_value(self) -> str:
+        # Исправлено: возвращается строка
+        return "some_other_value"
 
-# Исправленная функция: возвращает объект, а не строку
-def create_bad_class(value: int) -> BadClass:
-    return BadClass(value)
+    def compute_something(self) -> bool:
+        # Исправлено: метод возвращает True/False, значит тип bool (и None нам не нужен)
+        if self.value == 42:
+            return True
+        return False
 
-# Исправленная функция: явно возвращаем значение
-def check_logic(val: Optional[int]) -> int:
-    if val is None:
-        return 0
-    return val + 10  # Теперь mypy знает, что val не None
+    def it_will_fail(self) -> str:
+        # Исправлено: обращались к несуществующему атрибуту
+        other_value = "safe_value"
+        return other_value
+
+
+def viking_cafe_order(spam: str, beans: str, eggs: Optional[str] = None) -> str:
+    # Исправлено: spam должен быть строкой, чтобы его можно было складывать
+    del beans, eggs
+    return spam + spam + spam
+
+
+def compute_other_thing() -> None:
+    # Исправлено: голый except заменен на конкретную ошибку,
+    # а код разнесен на разные строки (требование flake8 и black)
+    try:
+        1 / 0
+    except ZeroDivisionError:
+        print("oops")

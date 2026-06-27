@@ -1,8 +1,9 @@
 from typing import cast
+
 from sqlalchemy import Column, Integer
 
-
 # ... остальные импорты
+
 
 @router.get("/{recipe_id}", response_model=schemas.RecipeOut)
 async def get_recipe(recipe_id: int, db: AsyncSession = Depends(get_db)):

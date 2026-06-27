@@ -1,4 +1,5 @@
 from fastapi.testclient import TestClient
+
 from module_30_ci_linters.homework.hw1.app import app
 
 client = TestClient(app)
