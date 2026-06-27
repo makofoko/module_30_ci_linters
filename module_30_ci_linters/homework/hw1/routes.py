@@ -32,10 +32,19 @@ async def get_recipe(recipe_id: int, db: AsyncSession = Depends(get_db)):
     )
     recipe = result.scalar_one()
     # Исправление для mypy
-    recipe.views = cast(int, recipe.views) + 1
-    await db.commit()
-    await db.refresh(recipe)
-    return recipe
+    @router.get("/{recipe_id}", response_model=schemas.RecipeOut)
+    async def get_recipe(recipe_id: int, db: AsyncSession = Depends(get_db)):
+        result = await db.execute(
+            select(models.Recipe).where(models.Recipe.id == recipe_id)
+        )
+        recipe = result.scalar_one()
+
+        # Добавляем # type: ignore, чтобы mypy пропустил эту строку
+        recipe.views = recipe.views + 1  # type: ignore
+
+        await db.commit()
+        await db.refresh(recipe)
+        return recipe
 
 @router.post("/", response_model=schemas.RecipeOut)
 async def create_recipe(

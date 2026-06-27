@@ -1,6 +1,7 @@
 """Module with some typical mistakes. They aimed to be find by linters."""
 from typing import Optional
 
+
 class BadClass:
     value: int = 42
 
@@ -16,9 +17,11 @@ class BadClass:
         other_value = "safe_value"
         return other_value
 
+
 def viking_cafe_order(spam: str, beans: str, eggs: Optional[str] = None) -> str:
     del beans, eggs
     return spam + spam + spam
+
 
 def compute_other_thing() -> None:
     try:
