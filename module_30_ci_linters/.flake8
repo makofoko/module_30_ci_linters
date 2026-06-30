@@ -1,7 +1,3 @@
 [flake8]
-# Увеличиваем лимит длины строки до 88, чтобы соответствовать black
 max-line-length = 88
-# Игнорируем конфликт с black по пробелам в срезах
 extend-ignore = E203
-# Исключаем лишние папки, чтобы не проверять дубли
-exclude = .git,__pycache__,venv,.venv,python_advanced
