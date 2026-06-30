@@ -1,71 +1,38 @@
+name: CI
+
 on:
-
   push:
-
     branches: [ "main" ]
 
-
-
 jobs:
-
   lint:
-
     runs-on: ubuntu-latest
-
     steps:
-      - name: Run flake8
-      - run: flake8 --config=.flake8 module_30_ci_linters
       - uses: actions/checkout@v4
       - name: Set up Python
-
         uses: actions/setup-python@v5
-
         with:
-
           python-version: "3.11"
-
       - name: Install dependencies
-
         run: pip install -r module_30_ci_linters/requirements.txt
-
       - name: Run mypy
-
         run: mypy module_30_ci_linters
-
       - name: Run black
-
         run: black --diff --check module_30_ci_linters
-
       - name: Run isort
-
         run: isort --check-only module_30_ci_linters
-
       - name: Run flake8
-
-        run: flake8 module_30_ci_linters
-
-
+        run: flake8 --config=.flake8 module_30_ci_linters
 
   test:
-
     runs-on: ubuntu-latest
-
     steps:
-
       - uses: actions/checkout@v4
-
       - name: Set up Python
-
         uses: actions/setup-python@v5
-
         with:
-
           python-version: "3.11"
-
       - name: Install dependencies
-
         run: pip install -r module_30_ci_linters/requirements.txt
-
       - name: Run pytest
-
         run: pytest module_30_ci_linters/tests -v
