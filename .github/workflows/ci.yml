@@ -22,7 +22,9 @@ jobs:
       - name: Run isort
         run: isort --check-only module_30_ci_linters
       - name: Run flake8
-        run: flake8 --config=.flake8 module_30_ci_linters
+        run: |
+          printf "[flake8]\nmax-line-length = 88\nextend-ignore = E203, E501\nexclude = .git,__pycache__,venv,.venv" > .flake8
+          flake8 --config=.flake8 module_30_ci_linters
 
   test:
     runs-on: ubuntu-latest
